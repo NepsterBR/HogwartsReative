@@ -1,9 +1,14 @@
 package com.example.javarxhogwarts.controller;
 
+import com.example.javarxhogwarts.Response.StudentResponse;
 import com.example.javarxhogwarts.repository.StudentRepository;
 import com.example.javarxhogwarts.request.StudentRequest;
 import com.example.javarxhogwarts.service.ConsumingApi;
+import com.example.javarxhogwarts.service.StudentService;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Single;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,25 +17,21 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/aluno")
 public class StudentController {
 
-    private final StudentRepository studentRepository;
+    private final StudentService studentService;
 
     @PostMapping("/cadastrar")
-    public ResponseEntity<?> registerStudent(@RequestBody StudentRequest studentRequest) {
-        var student = ConsumingApi.sortingHat();
-        student.setName(studentRequest.getName());
-        studentRepository.save(student);
-        return ResponseEntity.ok(studentRequest);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Single<StudentResponse> registerStudent(@RequestBody StudentRequest studentRequest) {
+        return studentService.registerStudent(studentRequest);
     }
 
     @GetMapping("/alunos")
-    public ResponseEntity<?> findAll() {
-        return ResponseEntity.ok().body(studentRepository.findAll());
+    public Observable<?> findAll() {
+        return studentService.findAll();
     }
 
     @GetMapping("/findByName/{name}")
-    public ResponseEntity<?> findByName(@PathVariable String name){
-        var student = studentRepository.findByName(name);
-        var response = ConsumingApi.findHouse(student);
-        return ResponseEntity.ok().body(response);
+    public Single<StudentResponse> findByName(@PathVariable String name){
+        return studentService.findByName(name);
     }
 }
