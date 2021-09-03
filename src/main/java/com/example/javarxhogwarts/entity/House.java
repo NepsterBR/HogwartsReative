@@ -1,12 +1,8 @@
 package com.example.javarxhogwarts.entity;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.stereotype.Service;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.List;
 
 @Getter

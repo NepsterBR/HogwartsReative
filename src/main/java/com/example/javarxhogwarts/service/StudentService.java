@@ -7,10 +7,16 @@ import com.example.javarxhogwarts.request.StudentRequest;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.core.Single;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+
+@Slf4j
 @Service
 @AllArgsConstructor
 public class StudentService {
@@ -35,16 +41,23 @@ public class StudentService {
         });
     }
 
+    @Transactional(readOnly = true)
     public Observable<?> findAll() {
-        Single<?> find = Single.create(single ->
-            single.onSuccess(
-                    studentRepository.findAll().stream().map(this::convertToOne).collect(Collectors.toList()))
-        );
-        return find.toObservable();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+        Observable<StudentResponse> map = Observable.fromIterable(studentRepository.findByNameIsNotNull()
+                .collect(Collectors.toList())).map(this::convertToOne);
+        stopWatch.stop();
+        log.info("Executou em {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
+        return map;
     }
 
     public StudentResponse convertToOne(Student student) {
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         var house = ConsumingApi.findHouse(student);
+        stopWatch.stop();
+        log.info("Executou em {}ms", stopWatch.getTime(TimeUnit.MILLISECONDS));
         return new StudentResponse(student, house);
     }
 }

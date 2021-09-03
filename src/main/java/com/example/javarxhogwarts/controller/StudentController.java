@@ -26,11 +26,13 @@ public class StudentController {
     }
 
     @GetMapping("/alunos")
+    @ResponseStatus(HttpStatus.OK)
     public Observable<?> findAll() {
         return studentService.findAll();
     }
 
     @GetMapping("/findByName/{name}")
+    @ResponseStatus(HttpStatus.OK)
     public Single<StudentResponse> findByName(@PathVariable String name){
         return studentService.findByName(name);
     }
