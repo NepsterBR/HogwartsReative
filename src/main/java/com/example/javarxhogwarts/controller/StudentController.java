@@ -26,4 +26,11 @@ public class StudentController {
     public ResponseEntity<?> findAll() {
         return ResponseEntity.ok().body(studentRepository.findAll());
     }
+
+    @GetMapping("/findByName/{name}")
+    public ResponseEntity<?> findByName(@PathVariable String name){
+        var student = studentRepository.findByName(name);
+        var response = ConsumingApi.findHouse(student);
+        return ResponseEntity.ok().body(response);
+    }
 }
